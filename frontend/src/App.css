@@ -1,0 +1,32 @@
+.app {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.muted {
+  color: #8b949e;
+  margin-top: 0.25rem;
+}
+
+.card {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border-radius: 8px;
+  background: #161b22;
+  border: 1px solid #30363d;
+}
+
+.card h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+.card ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.error {
+  color: #f85149;
+}
