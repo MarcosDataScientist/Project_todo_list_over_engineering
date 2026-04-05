@@ -1,46 +1,40 @@
-import { useEffect, useState } from "react";
-import "./App.css";
+import { Navigate, Route, Routes } from "react-router-dom";
+import AppLayout from "./components/AppLayout";
+import { getToken } from "./auth";
+import CadastroHubPage from "./pages/CadastroHubPage";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import TaskCreatePage from "./pages/TaskCreatePage";
+import TaskDetailPage from "./pages/TaskDetailPage";
+import TaskListPage from "./pages/TaskListPage";
+import UsuarioDadosPage from "./pages/UsuarioDadosPage";
 
-type StatusPayload = {
-  api: string;
-  supabase_configured: boolean;
-};
+function PrivateShell() {
+  if (!getToken()) {
+    return <Navigate to="/login" replace />;
+  }
+  return <AppLayout />;
+}
+
+function RootRedirect() {
+  return <Navigate to={getToken() ? "/inicio" : "/login"} replace />;
+}
 
 export default function App() {
-  const [status, setStatus] = useState<StatusPayload | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const base = import.meta.env.VITE_API_BASE_URL || "";
-    fetch(`${base}/api/v1/status`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then((data: StatusPayload) => setStatus(data))
-      .catch((e: Error) => setError(e.message));
-  }, []);
-
   return (
-    <main className="app">
-      <h1>Todo List</h1>
-      <p className="muted">React + Vite · integração com API Flask</p>
-      <section className="card">
-        <h2>Status da API</h2>
-        {error && <p className="error">Erro: {error}</p>}
-        {!error && !status && <p>Carregando…</p>}
-        {status && (
-          <ul>
-            <li>
-              <strong>API:</strong> {status.api}
-            </li>
-            <li>
-              <strong>Supabase configurado (backend):</strong>{" "}
-              {status.supabase_configured ? "sim" : "não"}
-            </li>
-          </ul>
-        )}
-      </section>
-    </main>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<PrivateShell />}>
+        <Route path="/inicio" element={<HomePage />} />
+        <Route path="/cadastro" element={<CadastroHubPage />} />
+        <Route path="/cadastro/tarefa" element={<TaskCreatePage />} />
+        <Route path="/cadastro/usuario" element={<UsuarioDadosPage />} />
+        <Route path="/tarefas" element={<TaskListPage />} />
+        <Route path="/tarefas/:id" element={<TaskDetailPage />} />
+        <Route path="/perfil" element={<Navigate to="/cadastro/usuario" replace />} />
+      </Route>
+      <Route path="/" element={<RootRedirect />} />
+      <Route path="*" element={<RootRedirect />} />
+    </Routes>
   );
 }

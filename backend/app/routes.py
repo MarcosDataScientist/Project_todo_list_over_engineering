@@ -51,3 +51,11 @@ def register(app: Flask) -> None:
             "api": "ok",
             "supabase_configured": sb is not None,
         }, 200
+
+    from .routes_auth import register_auth
+    from .routes_pessoa import register_pessoa
+    from .routes_tarefas import register_tarefas
+
+    register_auth(app)
+    register_pessoa(app)
+    register_tarefas(app)
