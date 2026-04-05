@@ -37,10 +37,23 @@ def _configure_cors(app: Flask) -> None:
         ).split(",")
         if o.strip()
     ]
-    CORS(app, resources={r"/api/*": {"origins": origins}}, supports_credentials=True)
+    CORS(
+        app,
+        resources={
+            r"/api/*": {"origins": origins},
+            r"/apispec.json": {"origins": origins},
+        },
+        supports_credentials=True,
+    )
 
 
 def _configure_swagger(app: Flask) -> None:
+    if os.environ.get("SKIP_SWAGGER") == "1":
+        return
+
+    if "flasgger" in app.extensions or "flasgger" in app.blueprints:
+        return
+
     app.config["SWAGGER"] = {
         "title": "Todo List API",
         "version": "1.0.0",
@@ -48,5 +61,16 @@ def _configure_swagger(app: Flask) -> None:
         "Documentação interativa via Swagger UI.",
         "termsOfService": "",
         "contact": {"name": "Equipe do projeto"},
+        "specs": [
+            {
+                "endpoint": "apispec",
+                "route": "/apispec.json",
+                "rule_filter": lambda rule: True,  # all in
+                "model_filter": lambda tag: True,  # all in
+            }
+        ],
+        "static_url_path": "/flasgger_static",
+        "swagger_ui": True,
+        "specs_route": "/apidocs/",
     }
     Swagger(app)

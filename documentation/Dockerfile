@@ -11,8 +11,8 @@ RUN npm install
 # Copy application code
 COPY . .
 
-# Expose Vite dev port
-EXPOSE 5173
+# Expose Docusaurus dev port
+EXPOSE 3000
 
 # Run dev server with host binding
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+CMD ["npm", "run", "start", "--", "--host", "0.0.0.0", "--port", "3000", "--poll", "1000"]
