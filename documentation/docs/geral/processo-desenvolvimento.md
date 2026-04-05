@@ -1,3 +1,8 @@
+---
+sidebar_position: 1
+title: Processo de Desenvolvimento
+---
+
 # Registro do processo de desenvolvimento
 
 Use este arquivo para documentar decisões, datas e entregas da disciplina de Engenharia de Software.
