@@ -1,0 +1,1 @@
+{"responses":{"200":{"description":"Serviço disponível","content":{"*/*":{"schema":{"properties":{"status":{"example":"ok","type":"string"}},"type":"object"}}}}}}
