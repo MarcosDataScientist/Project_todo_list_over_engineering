@@ -1,8 +1,0 @@
-{
-  "label": "Supabase",
-  "position": 4,
-  "link": {
-    "type": "generated-index",
-    "description": "Configuração do banco de dados, autenticação e políticas de segurança (RLS)."
-  }
-}

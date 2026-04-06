@@ -19,11 +19,11 @@ def create_app(test_config=None):
         app.config.from_mapping(test_config)
 
     _configure_cors(app)
-    _configure_swagger(app)
 
     from . import routes
 
     routes.register(app)
+    _configure_swagger(app)
 
     return app
 

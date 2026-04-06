@@ -33,17 +33,18 @@ services:
 
   documentation:
     build: 
-      context: ./documentation
+      context: ./doc
       dockerfile: Dockerfile
     container_name: todo-docs
     restart: always
     ports:
       - "3000:3000"
     volumes:
-      - ./documentation:/app
+      - ./doc:/app
       - /app/node_modules
     depends_on:
       - backend
     environment:
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
+      - OPENAPI_SPEC_URL=http://backend:5000/apispec.json
