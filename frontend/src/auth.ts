@@ -12,8 +12,12 @@ export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
 
+// export function apiBase(): string {
+//   return import.meta.env.VITE_API_BASE_URL || "";
+// }
+
 export function apiBase(): string {
-  return import.meta.env.VITE_API_BASE_URL || "";
+  return "";
 }
 
 export function authHeaders(json = true): HeadersInit {
