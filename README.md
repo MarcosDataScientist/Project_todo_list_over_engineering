@@ -4,40 +4,53 @@ Bem-vindo ao projeto **Todo List Over Engineering**. Este não é apenas um simp
 
 ---
 
-## 🏗️ Por que essa Arquitetura?
+## 🏗️ Arquitetura do Sistema
 
 Desenhamos este sistema para ser escalável e fácil de manter, separando as responsabilidades em três grandes pilares:
 
-1.  **Backend (Python/Flask)**: Escolhemos o Flask pela sua simplicidade e controle total sobre a API. Ele gerencia as regras de negócio e centraliza a comunicação com o Supabase.
-2.  **Frontend (React + Vite)**: O Vite nos dá velocidade, enquanto o React permite uma interface reativa e modularizada.
-3.  **Supabase (Nuvem)**: Optamos por um Postgres gerenciado para que o time tenha uma base de dados compartilhada instantaneamente, sem precisar configurar bancos locais complexos.
+| Camada | Tecnologia | Descrição |
+| :--- | :--- | :--- |
+| **Frontend** | React, Vite, TypeScript | Interface reativa e rápida com React Router para navegação. |
+| **Backend** | Python, Flask 3 | API REST gerenciando regras de negócio e integração com banco. |
+| **Banco / Auth** | Supabase (PostgreSQL) | Banco de dados gerenciado com autenticação integrada (JWT). |
+| **Documentação** | Docusaurus 2 | Guia técnico completo e centralizado. |
+| **Qualidade** | Pytest, Flake8 | Suite de testes para backend e análise estática de código. |
 
 ---
 
-## 🐳 Guia de Início Rápido com Docker (Recomendado)
+## 🐳 Guia de Início Rápido (Docker)
 
-A forma mais eficiente de rodar este projeto e garantir que "funcione na minha máquina" é utilizando o **Docker**. Ele isola todas as dependências (Python, Node, bibliotecas) dentro de containers.
+A forma recomendada de rodar este projeto é através do **Docker**, garantindo consistência entre ambientes.
 
 ### 1. Pré-requisitos
-Antes de começar, você precisará ter instalado:
-- **Docker Desktop** (que já inclui o Docker Compose). [Baixe aqui](https://www.docker.com/products/docker-desktop/).
+- **Docker Desktop** instalado. [Baixe aqui](https://www.docker.com/products/docker-desktop/).
 
-### 2. Preparando os Segredos (.env)
-O sistema precisa de chaves para falar com o Supabase. 
+### 2. Configurando Variáveis de Ambiente (.env)
+O sistema necessita de chaves de comunicação com o Supabase.
+
 - Entre nas pastas `backend/` e `frontend/`.
 - Copie os arquivos `.env.example` para `.env`.
-- Configure as suas chaves do Supabase no `backend/.env` (Project URL e Service Role Key).
+- Configure as chaves do Supabase em `backend/.env` (URL e Service Role Key).
 
 ### 3. Subindo o Ambiente
-Na raiz do projeto, execute o comando que irá construir as imagens e subir os serviços:
-
+Na raiz do projeto, execute:
 ```powershell
 ##ATENCAO MANTER O DOCKER.DESKTOP ABERTO PRA INICIAR O CONTEINER (LOGADO)
 docker compose up --build
 ```
 
-> [!TIP]
-> **Hot Reload Ativo**: Configuramos os volumes e o sistema de polling para que qualquer alteração que você fizer no código (Backend, Frontend ou Docs) seja refletida **instantaneamente** no navegador, sem precisar reiniciar o Docker.
+---
+
+## 🗺️ Mapa de Acesso
+
+Após o "Server started", você poderá acessar as interfaces através dos endereços abaixo:
+
+| Serviço | Endereço | Descrição |
+| :--- | :--- | :--- |
+| **Frontend** | [http://localhost:5173](http://localhost:5173) | Interface principal do usuário. |
+| **Documentação** | [http://localhost:3000](http://localhost:3000) | Guia técnico detalhado em Docusaurus. |
+| **API Backend** | [http://localhost:5000](http://localhost:5000) | Endpoints REST da aplicação. |
+| **Swagger UI** | [http://localhost:5000/apidocs](http://localhost:5000/apidocs) | Documentação interativa da API. |
 
 > [!NOTE]
 > **Backend na porta 5000**: o mapeamento é `5000:5000` (host ↔ container). O Flask lê **apenas** `backend/.env` (igual ao dev local); não há variáveis de ambiente duplicadas no Compose que sobrescrevam o `.env`. O Vite no container usa `VITE_DEV_PROXY_TARGET=http://backend:5000` para encaminhar `/api` e `/health` ao serviço Docker `backend`. **Não** defina `VITE_API_BASE_URL=/api/v1` no Compose: o front já chama `${apiBase()}/api/v1/...`; com prefixo duplicado o login vira `POST /api/v1/api/v1/auth/login` (404). Deixe `VITE_API_BASE_URL` vazio e use só o proxy. Atualize `CORS_ORIGINS` no `.env` conforme `backend/.env.example` (inclui origens na porta 3000 da documentação).
@@ -45,41 +58,24 @@ docker compose up --build
 
 ---
 
+<<<<<<< HEAD
+=======
+## 📁 Estrutura do Projeto
+
+>>>>>>> b0a5ff6e0484100d9860f4893b627a541e67d944
 ```text
 .
-├── README.md
-├── docs/
-│   ├── PROCESSO_DESENVOLVIMENTO.md   # registro do processo (entregas, decisões)
-│   └── supabase_schema.sql           # DDL: pessoa + tarefas (rodar no SQL Editor)
-├── backend/                          # API Flask
-│   ├── .env.example
-│   ├── pytest.ini
-│   ├── requirements.txt
-│   ├── wsgi.py
-│   ├── app/
-│   │   ├── __init__.py               # create_app, CORS, Swagger
-│   │   ├── routes.py                 # rotas web e /api/v1/...
-│   │   ├── routes_auth.py            # login /auth/me (Supabase Auth)
-│   │   ├── routes_tarefas.py         # CRUD tarefas (JWT + pessoa)
-│   │   ├── routes_pessoa.py          # GET/PATCH perfil pessoa (JWT)
-│   │   ├── auth_pessoa.py            # Supabase + id pessoa logada
-│   │   ├── auth_context.py           # Bearer + get_user
-│   │   ├── services/
-│   │   │   └── pessoa.py             # vínculo auth.users → pessoa
-│   │   ├── templates/
-│   │   ├── static/
-│   │   └── integrations/
-│   │       └── supabase_client.py
-│   └── tests/                        # Pytest
-└── frontend/                         # React + Vite + TypeScript
-    ├── .env.example
-    ├── index.html
-    ├── vite.config.ts
-    └── src/
-        ├── pages/                    # Login, menu, cadastros, lista/detalhe tarefas, perfil
-        ├── components/               # layout com menu (área logada)
-        └── auth.ts                   # token no localStorage
+├── backend/                # API Flask (Python)
+│   ├── app/                # Lógica da aplicação
+│   ├── tests/              # Suite de testes Pytest
+│   └── wsgi.py             # Entrypoint do servidor
+├── frontend/               # SPA React (TypeScript)
+│   ├── src/pages/          # Páginas da aplicação
+│   └── src/components/     # Componentes reutilizáveis
+├── documentation/          # Site Docusaurus
+└── docker-compose.yml      # Orquestração de containers
 ```
+<<<<<<< HEAD
 
 Assim que o Docker terminar de subir (você verá os logs de "Server started"), você poderá acessar:
 
@@ -90,15 +86,20 @@ Assim que o Docker terminar de subir (você verá os logs de "Server started"), 
 | Banco / auth  | Supabase (PostgreSQL)               |
 | Testes (API)  | Pytest                              |
 | Documentação API | Swagger UI via Flasgger (`/apidocs`) |
+=======
+>>>>>>> b0a5ff6e0484100d9860f4893b627a541e67d944
 
 ---
 
 ## 🛠️ Qualidade e CI/CD
 
-Para manter o projeto saudável, integramos um pipeline de **GitHub Actions**. Sempre que você abrir um Pull Request, o GitHub irá:
-- Validar se o Backend passa no Linter (`flake8`) e nos Testes (`pytest`).
-- Verificar se o Frontend e a Documentação fazem o Build sem erros.
+Utilizamos **GitHub Actions** para automação de processos de qualidade:
 
+- **Linting**: O backend é validado pelo `flake8`.
+- **Testes**: Execução automática de `pytest` em cada Pull Request.
+- **Build**: Verificação de integridade do build para frontend e documentação.
+
+<<<<<<< HEAD
 - API de exemplo: `GET /api/v1/status` — indica se o Supabase está configurado no servidor.
 - **Swagger UI:** após subir o Flask, abra `http://127.0.0.1:5000/apidocs` para explorar e testar os endpoints documentados.
 - O `.env` é carregado a partir de **`backend/.env`** mesmo se você rodar o Flask a partir de outra pasta (desde que o módulo `app` seja o do projeto).
@@ -111,41 +112,36 @@ cd backend
 source .venv/bin/activate
 pytest
 ```
+=======
+> [!IMPORTANT]
+> **Boas Práticas**: Siga as convenções de commits e abertura de branches (`feature/`, `bugfix/`) conforme descrito na nossa documentação oficial local.
 
-## Frontend (React + Vite)
+---
 
-### Configuração
+## 🔐 Autenticação e API
+>>>>>>> b0a5ff6e0484100d9860f4893b627a541e67d944
 
-```bash
-cd frontend
-npm install
-cp .env.example .env
-npm run dev
-```
+O sistema utiliza **JWT (JSON Web Token)** para sessões seguras.
 
-- Interface padrão: `http://127.0.0.1:5173` (com proxy para a API em `http://127.0.0.1:5000`).
-- `VITE_API_BASE_URL`: em dev costuma ficar vazio (requisições relativas + proxy). Em produção, aponte para a URL pública da API.
+### Fluxo de Login
+1. O usuário se autentica na rota `/login` do frontend.
+2. O Backend valida as credenciais no Supabase Auth.
+3. O token retornado é armazenado no `localStorage`.
+4. Todas as requisições subsequentes para a API devem conter o header:
+   `Authorization: Bearer <seu_token>`
 
-### Login e área logada
-
-- Rota **`/login`**: envio assíncrono (`fetch`) para `POST /api/v1/auth/login` com `email` e `password` (usuário deve existir em **Supabase → Authentication**).
-- Em sucesso, o **access token** (JWT) é guardado em `localStorage` e o app redireciona para **`/inicio`** (menu com resumo do cadastro **pessoa** e atalhos).
-- **`GET /api/v1/auth/me`** valida o token (`Authorization: Bearer …`).
-- **Sair** remove o token e volta para `/login`.
-- Fluxo típico: **`/inicio`** → **Cadastros** (`/cadastro`: tarefa ou usuário em `/cadastro/usuario`), **Lista de tarefas** (`/tarefas`, observação truncada a 150 caracteres), detalhe em **`/tarefas/<id>`** (somente leitura, editar ou excluir). Após **cadastrar** uma tarefa, o app volta para **`/tarefas`** com a lista completa (a nova costuma aparecer primeiro, por ordem de criação). A rota **`/perfil`** redireciona para **`/cadastro/usuario`**. Todas as chamadas à API enviam `Authorization: Bearer …`.
-
-### API de tarefas (requer JWT)
+### Endpoints Principais (Tarefas)
 
 | Método | Rota | Descrição |
-|--------|------|------------|
-| `GET` | `/api/v1/tarefas` | Listar tarefas do usuário |
-| `GET` | `/api/v1/tarefas/<id>` | Buscar uma tarefa |
-| `POST` | `/api/v1/tarefas` | Criar (`descricao_tarefa`, `data_expiracao`, `observacao` opcional, `status` opcional, default `PENDENTE`) |
-| `PATCH` | `/api/v1/tarefas/<id>` | Editar campos enviados |
-| `DELETE` | `/api/v1/tarefas/<id>` | Excluir |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/tarefas` | Listar tarefas do usuário logado. |
+| `POST` | `/api/v1/tarefas` | Criar uma nova tarefa. |
+| `PATCH` | `/api/v1/tarefas/<id>` | Atualizar dados de uma tarefa existente. |
+| `DELETE` | `/api/v1/tarefas/<id>` | Remover uma tarefa. |
 
-### API de pessoa / perfil (requer JWT)
+---
 
+<<<<<<< HEAD
 | Método | Rota | Descrição |
 |--------|------|------------|
 | `GET` | `/api/v1/pessoa/me` | Dados do cadastro **pessoa** do usuário logado |
@@ -168,3 +164,6 @@ Atualize `docs/PROCESSO_DESENVOLVIMENTO.md` com entregas, decisões de equipe e 
 ## Licença
 
 Veja o arquivo `LICENSE` na raiz do repositório.
+=======
+**Engenharia de Software — Projeto Acadêmico**
+>>>>>>> b0a5ff6e0484100d9860f4893b627a541e67d944

@@ -1,0 +1,1 @@
+{"title":"Body","body":{"content":{"application/json":{"schema":{"properties":{"cpf":{"type":"string"},"nascimento":{"format":"date","type":"string"},"nome":{"type":"string"},"status":{"type":"string"}},"type":"object"}}}}}

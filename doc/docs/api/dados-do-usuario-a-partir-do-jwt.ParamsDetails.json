@@ -1,0 +1,1 @@
+{"parameters":[{"description":"Bearer access_token","in":"header","name":"Authorization","required":true,"schema":{"type":"string"}}]}

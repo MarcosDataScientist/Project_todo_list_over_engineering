@@ -1,0 +1,1 @@
+{"title":"Body","body":{"content":{"application/json":{"schema":{"properties":{"data_expiracao":{"format":"date","type":"string"},"descricao_tarefa":{"type":"string"},"observacao":{"description":"Observações opcionais sobre a tarefa","type":"string"},"status":{"type":"string"}},"required":["data_expiracao","descricao_tarefa"],"type":"object"}}}}}

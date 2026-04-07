@@ -1,0 +1,1 @@
+{"responses":{"200":{"description":"Informações de status","content":{"*/*":{"schema":{"properties":{"api":{"type":"string"},"supabase_configured":{"type":"boolean"}},"type":"object"}}}}}}

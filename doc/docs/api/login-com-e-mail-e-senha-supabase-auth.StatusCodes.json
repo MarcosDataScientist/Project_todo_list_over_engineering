@@ -1,0 +1,1 @@
+{"responses":{"200":{"description":"Sessão criada","content":{"*/*":{"schema":{"properties":{"access_token":{"type":"string"},"refresh_token":{"type":"string"},"user":{"type":"object"}},"type":"object"}}}},"400":{"description":"Corpo inválido"},"401":{"description":"Credenciais inválidas"},"503":{"description":"Supabase não configurado"}}}
