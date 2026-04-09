@@ -74,7 +74,7 @@ export default function LoginPage() {
     <main className="login-page">
       <div className="login-card">
         <h1>Todo List</h1>
-        <p className="login-lead">Entre com sua conta Supabase (e-mail e senha)</p>
+        <p className="login-lead">Entre com seus dados (e-mail e senha)</p>
         <form onSubmit={handleSubmit} className="login-form">
           <label>
             E-mail
