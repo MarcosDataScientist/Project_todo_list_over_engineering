@@ -2,11 +2,13 @@ import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiBase, authHeaders, clearToken, getToken } from "../auth";
 import { STATUS_INFO, STATUS_OPTIONS, statusDisplay } from "../lib/tarefaUtils";
+import { useToast } from "../components/ToastContext";
 import "./TasksPage.css";
 import "./HubPages.css";
 
 export default function TaskCreatePage() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [newDesc, setNewDesc] = useState("");
   const [newExp, setNewExp] = useState("");
   const [newStatus, setNewStatus] = useState("PENDENTE");
@@ -42,12 +44,14 @@ export default function TaskCreatePage() {
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Erro ao criar");
+        showToast(data.error || "Erro ao criar tarefa", "error");
         return;
       }
-      // Lista completa: o usuário precisa ver todas as tarefas, não só o detalhe da nova.
+      showToast("Tarefa criada com sucesso", "success");
       navigate("/tarefas", { replace: true });
     } catch {
       setError("Falha ao criar tarefa");
+      showToast("Falha ao criar tarefa", "error");
     } finally {
       setCreating(false);
     }
