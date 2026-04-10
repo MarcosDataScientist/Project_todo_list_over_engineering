@@ -2,6 +2,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { apiBase, authHeaders, clearToken, getToken } from "../auth";
 import { STATUS_INFO, STATUS_OPTIONS, statusDisplay } from "../lib/tarefaUtils";
+import { useToast } from "../components/ToastContext";
 import type { Tarefa } from "../types/tarefa";
 import "./TasksPage.css";
 import "./HubPages.css";
@@ -9,6 +10,7 @@ import "./HubPages.css";
 export default function TaskDetailPage() {
   const { id: idParam } = useParams();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const taskId = Number(idParam);
   const idValid = Number.isFinite(taskId) && taskId > 0;
 
@@ -115,12 +117,15 @@ export default function TaskDetailPage() {
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Erro ao salvar");
+        showToast(data.error || "Erro ao salvar tarefa", "error");
         return;
       }
       setTarefa(data.tarefa);
       setEditing(false);
+      showToast("Tarefa atualizada com sucesso", "success");
     } catch {
       setError("Falha ao salvar");
+      showToast("Falha ao salvar tarefa", "error");
     } finally {
       setSaving(false);
     }
@@ -142,11 +147,14 @@ export default function TaskDetailPage() {
       if (!res.ok && res.status !== 204) {
         const data = await res.json().catch(() => ({}));
         setError(data.error || `Erro ${res.status}`);
+        showToast(data.error || "Erro ao excluir tarefa", "error");
         return;
       }
+      showToast("Tarefa excluída com sucesso", "success");
       navigate("/tarefas", { replace: true });
     } catch {
       setError("Falha ao excluir");
+      showToast("Falha ao excluir tarefa", "error");
     }
   }
 
