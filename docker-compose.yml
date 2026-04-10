@@ -9,7 +9,6 @@ services:
       - "5000:5000"
     volumes:
       - ./backend:/app
-    # Mesmas variáveis do Flask local: tudo vem de backend/.env (não sobrescrever FLASK_* / CORS_* / SECRET_* aqui).
     env_file:
       - ./backend/.env
 
@@ -26,11 +25,8 @@ services:
       - /app/node_modules
     depends_on:
       - backend
-    environment:
-      # Não definir VITE_API_BASE_URL aqui: o código já prefixa /api/v1 em cada fetch.
-      # Se fosse /api/v1, viraria /api/v1/api/v1/... no proxy (404).
-      # Proxy do Vite dentro da rede Docker → Flask em backend:5000
-      - VITE_DEV_PROXY_TARGET=http://backend:5000
+    env_file:
+      - ./frontend/.env
 
   documentation:
     build: 
