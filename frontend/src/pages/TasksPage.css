@@ -415,3 +415,64 @@
   color: #f85149;
   cursor: pointer;
 }
+
+.tasks-search-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.tasks-search-input {
+  width: 100%;
+  padding: 0.65rem 2.8rem 0.65rem 1rem;
+  border: 1.5px solid #3a3a4a;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: #1e1e2e;
+  color: #e2e2f0;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  caret-color: #7c7cff;
+}
+
+.tasks-search-input::placeholder {
+  color: #6b6b85;
+}
+
+.tasks-search-input:focus {
+  border-color: #5c5cff;
+  box-shadow: 0 0 0 3px rgba(92, 92, 255, 0.15);
+}
+
+/* Esconde o ✕ nativo do input type="search" */
+.tasks-search-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.tasks-search-clear {
+  position: absolute;
+  right: 0.65rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b6b85;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.35rem;
+  line-height: 1;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.tasks-search-clear:hover {
+  color: #e2e2f0;
+  background: #2e2e3e;
+}
+
+.tasks-search-count {
+  margin-top: -0.4rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  color: #9090aa;
+}
