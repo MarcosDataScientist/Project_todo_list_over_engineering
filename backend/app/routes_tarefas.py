@@ -1,8 +1,8 @@
 from flask import Flask, jsonify, request
-
+ 
 from .auth_pessoa import supabase_pessoa_or_error
-
-
+ 
+ 
 def register_tarefas(app: Flask) -> None:
     @app.get("/api/v1/tarefas")
     def listar_tarefas():
@@ -13,6 +13,12 @@ def register_tarefas(app: Flask) -> None:
         security:
           - Bearer: []
         summary: Lista tarefas
+        parameters:
+          - in: query
+            name: q
+            type: string
+            required: false
+            description: Termo para filtrar por descrição, status ou observação
         responses:
           200:
             description: Lista
@@ -22,15 +28,26 @@ def register_tarefas(app: Flask) -> None:
         sb, pessoa_id, err = supabase_pessoa_or_error()
         if err:
             return err
-        res = (
+ 
+        q = request.args.get("q", "").strip()
+ 
+        query = (
             sb.table("tarefas")
             .select("*")
             .eq("pessoa_id", pessoa_id)
             .order("data_criacao", desc=True)
-            .execute()
         )
-        return jsonify({"tarefas": res.data or []}), 200
-
+ 
+        if q:
+            query = query.or_(
+                f"descricao_tarefa.ilike.%{q}%,"
+                f"status.ilike.%{q}%,"
+                f"observacao.ilike.%{q}%"
+            )
+ 
+        res = query.execute()
+        return jsonify({"tarefas": res.data or [], "q": q or None}), 200
+ 
     @app.get("/api/v1/tarefas/<int:task_id>")
     def buscar_tarefa(task_id: int):
         """Buscar uma tarefa por id
@@ -63,7 +80,7 @@ def register_tarefas(app: Flask) -> None:
         if not res.data:
             return jsonify({"error": "tarefa não encontrada"}), 404
         return jsonify({"tarefa": res.data[0]}), 200
-
+ 
     @app.post("/api/v1/tarefas")
     def criar_tarefa():
         """Cadastrar tarefa
@@ -108,7 +125,7 @@ def register_tarefas(app: Flask) -> None:
             observacao = ""
         if not descricao or not data_exp:
             return jsonify({"error": "descricao_tarefa e data_expiracao são obrigatórios"}), 400
-
+ 
         row = {
             "pessoa_id": pessoa_id,
             "data_expiracao": data_exp,
@@ -130,7 +147,7 @@ def register_tarefas(app: Flask) -> None:
         else:
             t = ins.data[0] if isinstance(ins.data, list) else ins.data
         return jsonify({"tarefa": t}), 201
-
+ 
     @app.patch("/api/v1/tarefas/<int:task_id>")
     def editar_tarefa(task_id: int):
         """Editar tarefa
@@ -168,7 +185,7 @@ def register_tarefas(app: Flask) -> None:
             updates["observacao"] = "" if obs is None else str(obs)
         if not updates:
             return jsonify({"error": "nenhum campo para atualizar"}), 400
-
+ 
         check = (
             sb.table("tarefas")
             .select("id")
@@ -179,7 +196,7 @@ def register_tarefas(app: Flask) -> None:
         )
         if not check.data:
             return jsonify({"error": "tarefa não encontrada"}), 404
-
+ 
         sb.table("tarefas").update(updates).eq("id", task_id).eq(
             "pessoa_id", pessoa_id
         ).execute()
@@ -192,7 +209,7 @@ def register_tarefas(app: Flask) -> None:
             .execute()
         )
         return jsonify({"tarefa": res.data[0]}), 200
-
+ 
     @app.delete("/api/v1/tarefas/<int:task_id>")
     def excluir_tarefa(task_id: int):
         """Excluir tarefa
@@ -226,3 +243,4 @@ def register_tarefas(app: Flask) -> None:
             return jsonify({"error": "tarefa não encontrada"}), 404
         sb.table("tarefas").delete().eq("id", task_id).eq("pessoa_id", pessoa_id).execute()
         return "", 204
+ 

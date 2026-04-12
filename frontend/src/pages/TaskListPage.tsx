@@ -13,8 +13,10 @@ export default function TaskListPage() {
   const [todos, setTodos] = useState<Tarefa[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
 
-  const loadTodos = useCallback(async () => {
+  const loadTodos = useCallback(async (q = "") => {
     if (!getToken()) {
       navigate("/login", { replace: true });
       return;
@@ -22,7 +24,10 @@ export default function TaskListPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${apiBase()}/api/v1/tarefas`, { headers: authHeaders() });
+      const url = new URL(`${apiBase()}/api/v1/tarefas`);
+      if (q) url.searchParams.set("q", q);
+
+      const res = await fetch(url.toString(), { headers: authHeaders() });
       if (res.status === 401) {
         clearToken();
         navigate("/login", { replace: true });
@@ -45,26 +50,77 @@ export default function TaskListPage() {
     loadTodos();
   }, [loadTodos]);
 
+  // Dispara busca com debounce de 400ms
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      loadTodos(searchInput.trim());
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleClearSearch() {
+    setSearchInput("");
+    setSearch("");
+    loadTodos("");
+  }
+
   return (
     <main className="tasks-page hub-page">
       <div className="tasks-list-head hub-list-head">
         <h1 className="hub-title" style={{ margin: 0 }}>
           Lista de tarefas
         </h1>
-        <button type="button" className="tasks-refresh" onClick={() => loadTodos()} disabled={loading}>
+        <button
+          type="button"
+          className="tasks-refresh"
+          onClick={() => loadTodos(search)}
+          disabled={loading}
+        >
           {loading ? "Atualizando…" : "Atualizar"}
         </button>
       </div>
+
       <p className="hub-lead">
         Toque ou clique em uma tarefa para <strong>visualizar o detalhe</strong> e, a partir daí, editar ou excluir.
         A observação na lista mostra apenas os primeiros {OBS_PREVIEW_LEN} caracteres.
       </p>
 
+      {/* ── Campo de pesquisa ── */}
+      <div className="tasks-search-wrapper">
+        <input
+          type="search"
+          className="tasks-search-input"
+          placeholder="Pesquisar por descrição, status ou observação…"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          aria-label="Pesquisar tarefas"
+        />
+        {searchInput && (
+          <button
+            type="button"
+            className="tasks-search-clear"
+            onClick={handleClearSearch}
+            aria-label="Limpar pesquisa"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+
+      {search && !loading && (
+        <p className="hub-muted tasks-search-count">
+          {todos.length === 0
+            ? "Nenhuma tarefa encontrada para essa pesquisa."
+            : `${todos.length} tarefa${todos.length > 1 ? "s" : ""} encontrada${todos.length > 1 ? "s" : ""}.`}
+        </p>
+      )}
+
       {error && <p className="hub-banner-error">{error}</p>}
 
       {loading && todos.length === 0 ? (
         <p className="hub-muted">Carregando…</p>
-      ) : todos.length === 0 ? (
+      ) : todos.length === 0 && !search ? (
         <p className="hub-muted">Nenhuma tarefa. Use Cadastros → Cadastrar tarefa.</p>
       ) : (
         <ul className="tasks-list">
